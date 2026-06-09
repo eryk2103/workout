@@ -1,0 +1,47 @@
+<div class="flex flex-col gap-4 p-4">
+  <h1 class="text-2xl font-bold text-gray-900">Calendar</h1>
+
+  <div class="flex items-center justify-between">
+    <button
+      type="button"
+      (click)="prevMonth()"
+      class="flex size-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      aria-label="Previous month"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+    <span class="text-sm font-semibold text-gray-900">{{ monthYear() }}</span>
+    <button
+      type="button"
+      (click)="nextMonth()"
+      class="flex size-9 items-center justify-center rounded-full text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+      aria-label="Next month"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
+      </svg>
+    </button>
+  </div>
+
+  <ul class="flex flex-col gap-2" aria-label="Calendar days">
+    @for (day of days(); track day.dayNumber) {
+      <li
+        class="rounded-xl bg-white shadow-sm border"
+        [class.border-blue-500]="day.isToday"
+        [class.border-transparent]="!day.isToday"
+      >
+        <a
+          [routerLink]="['/calendar', day.dateParam]"
+          class="flex items-center gap-4 px-4 py-3"
+        >
+          <span class="w-10 text-sm text-gray-400">{{ day.dayName }}</span>
+          <span class="w-6 text-center text-lg font-bold text-gray-900">{{ day.dayNumber }}</span>
+          <span class="flex-1 text-sm text-gray-700">Full body</span>
+          <span class="text-xs font-medium text-blue-500">+2</span>
+        </a>
+      </li>
+    }
+  </ul>
+</div>

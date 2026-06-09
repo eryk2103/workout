@@ -1,0 +1,23 @@
+<div class="flex flex-col gap-4 p-4">
+  <a
+    routerLink="/exercises"
+    class="flex items-center gap-1 text-sm font-medium text-blue-600"
+    aria-label="Back to exercises"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
+    Exercises
+  </a>
+
+  <h1 class="text-2xl font-bold text-gray-900">New Exercise</h1>
+
+  <app-exercise-form />
+
+  <button
+    type="submit"
+    class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+  >
+    Save Exercise
+  </button>
+</div>

@@ -1,0 +1,122 @@
+<form [formGroup]="form" class="flex flex-col gap-6">
+  <div class="flex flex-col gap-1.5">
+    <label for="name" class="text-sm font-medium text-gray-700">
+      Name <span class="text-red-500" aria-hidden="true">*</span>
+    </label>
+    <input
+      id="name"
+      type="text"
+      formControlName="name"
+      placeholder="e.g. Push Day"
+      class="rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+    />
+  </div>
+
+  <div class="flex flex-col gap-2">
+    <div class="flex items-center justify-between">
+      <p class="text-sm font-medium text-gray-700">Exercises</p>
+      <button
+        type="button"
+        (click)="newExerciseModalOpen.set(true)"
+        class="flex items-center gap-1 text-sm font-medium text-blue-600"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        New Exercise
+      </button>
+    </div>
+
+    @if (selectedExercises().size > 0) {
+      <ul class="flex flex-wrap gap-2" aria-label="Selected exercises">
+        @for (exercise of selectedExerciseList(); track exercise) {
+          <li class="flex items-center gap-1.5 rounded-full bg-blue-100 px-3 py-1 text-xs font-medium text-blue-700">
+            {{ exercise }}
+            <button
+              type="button"
+              (click)="toggleExercise(exercise)"
+              class="text-blue-500 hover:text-blue-700 focus:outline-none"
+              [attr.aria-label]="'Remove ' + exercise"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </li>
+        }
+      </ul>
+    }
+
+    <input
+      type="search"
+      placeholder="Search exercises..."
+      [value]="exerciseQuery()"
+      (input)="exerciseQuery.set($any($event.target).value)"
+      class="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+      aria-label="Search exercises"
+    />
+
+    <ul class="flex flex-col gap-2" aria-label="Available exercises">
+      @for (exercise of filteredExercises(); track exercise) {
+        <li>
+          <button
+            type="button"
+            (click)="toggleExercise(exercise)"
+            class="flex w-full items-center justify-between rounded-xl border bg-white px-4 py-3 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            [class.border-blue-500]="selectedExercises().has(exercise)"
+            [class.text-blue-600]="selectedExercises().has(exercise)"
+            [class.border-transparent]="!selectedExercises().has(exercise)"
+            [class.text-gray-900]="!selectedExercises().has(exercise)"
+            [attr.aria-pressed]="selectedExercises().has(exercise)"
+          >
+            {{ exercise }}
+            @if (selectedExercises().has(exercise)) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="size-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+              </svg>
+            }
+          </button>
+        </li>
+      }
+    </ul>
+  </div>
+</form>
+
+@if (newExerciseModalOpen()) {
+  <div
+    class="fixed inset-0 z-40 bg-black/50"
+    (click)="newExerciseModalOpen.set(false)"
+    aria-hidden="true"
+  ></div>
+
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="new-exercise-modal-title"
+    class="fixed inset-x-4 top-1/2 z-50 flex max-h-[75vh] -translate-y-1/2 flex-col gap-4 rounded-2xl bg-white p-4 shadow-xl"
+  >
+    <div class="flex items-center justify-between">
+      <h2 id="new-exercise-modal-title" class="text-lg font-semibold text-gray-900">New Exercise</h2>
+      <button
+        type="button"
+        (click)="newExerciseModalOpen.set(false)"
+        class="flex size-8 items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        aria-label="Close modal"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <app-exercise-form />
+
+    <button
+      type="button"
+      (click)="newExerciseModalOpen.set(false)"
+      class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+    >
+      Save Exercise
+    </button>
+  </div>
+}

@@ -1,0 +1,83 @@
+<div class="flex flex-col gap-6 p-4">
+  <a
+    routerLink="/calendar"
+    class="flex items-center gap-1 text-sm font-medium text-blue-600"
+    aria-label="Back to calendar"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
+    </svg>
+    Calendar
+  </a>
+
+  <h1 class="text-2xl font-bold text-gray-900">{{ name() }}</h1>
+
+  <ul class="flex flex-col gap-4">
+    @for (exercise of exercises(); track exercise.name; let ei = $index) {
+      <li class="flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm">
+        <p class="font-semibold text-gray-900">{{ exercise.name }}</p>
+
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-3 text-xs font-medium text-gray-400">
+            <span class="w-8">Set</span>
+            <span class="flex-1">Reps</span>
+            <span class="flex-1">KG</span>
+            <span class="w-8"></span>
+          </div>
+
+          @for (set of exercise.sets; track $index; let si = $index) {
+            <div class="flex items-center gap-3">
+              <span class="w-8 text-sm font-medium text-gray-400">{{ si + 1 }}</span>
+              <input
+                type="number"
+                min="0"
+                [value]="set.reps"
+                (change)="updateReps(ei, si, $any($event.target).value)"
+                [id]="exercise.name + '-set-' + si + '-reps'"
+                [attr.aria-label]="exercise.name + ' set ' + (si + 1) + ' reps'"
+                class="flex-1 min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+              <input
+                type="number"
+                min="0"
+                [value]="set.kg"
+                (change)="updateKg(ei, si, $any($event.target).value)"
+                [id]="exercise.name + '-set-' + si + '-kg'"
+                [attr.aria-label]="exercise.name + ' set ' + (si + 1) + ' kg'"
+                class="flex-1 min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+              />
+              <button
+                type="button"
+                (click)="removeSet(ei, si)"
+                class="w-8 flex items-center justify-center text-gray-300 hover:text-red-400 focus:outline-none"
+                [attr.aria-label]="'Delete set ' + (si + 1) + ' of ' + exercise.name"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+          }
+        </div>
+
+        <button
+          type="button"
+          (click)="addSet(ei)"
+          class="flex items-center gap-1.5 self-start text-sm font-medium text-blue-600 focus:outline-none"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Set
+        </button>
+      </li>
+    }
+  </ul>
+
+  <button
+    type="button"
+    class="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+  >
+    Finish Workout
+  </button>
+</div>
