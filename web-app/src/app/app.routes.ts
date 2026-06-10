@@ -8,6 +8,6 @@ export const routes: Routes = [
   { path: 'workouts/:id', loadComponent: () => import('./workouts/workout-detail/workout-detail').then(m => m.WorkoutDetail) },
   { path: 'exercises', loadComponent: () => import('./exercises/exercises/exercises').then(m => m.Exercises) },
   { path: 'exercises/new', loadComponent: () => import('./exercises/new-exercise/new-exercise').then(m => m.NewExercise) },
-  { path: 'workout-log/:name', loadComponent: () => import('./workout-log/workout-log').then(m => m.WorkoutLog) },
+  { path: 'workout-log/:id', loadComponent: () => import('./workout-log/workout-log').then(m => m.WorkoutLog) },
   { path: '', redirectTo: 'calendar', pathMatch: 'full' },
 ];

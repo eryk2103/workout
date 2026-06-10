@@ -1,12 +1,18 @@
-import { Component, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
+import { ExerciseSession } from '../exercises/exercise-session-model';
+import { ExerciseSessionService } from '../exercises/exercise-session-service';
+import { WorkoutSession } from '../workouts/workout-session-model';
+import { WorkoutSessionService } from '../workouts/workout-session-service';
 
 interface SetLog {
+  id: number;
   reps: number;
   kg: number;
 }
 
 interface ExerciseLog {
+  exerciseId: number;
   name: string;
   sets: SetLog[];
 }
@@ -17,50 +23,99 @@ interface ExerciseLog {
   templateUrl: './workout-log.html',
 })
 export class WorkoutLog {
-  name = input.required<string>();
+  id = input.required<string>();
 
-  protected readonly exercises = signal<ExerciseLog[]>([
-    { name: 'Bench Press', sets: [{ reps: 10, kg: 60 }] },
-    { name: 'Squat', sets: [{ reps: 8, kg: 80 }] },
-    { name: 'Deadlift', sets: [{ reps: 5, kg: 100 }] },
-  ]);
+  private readonly workoutSessionService = inject(WorkoutSessionService);
+  private readonly exerciseSessionService = inject(ExerciseSessionService);
 
-  protected addSet(exerciseIndex: number): void {
-    this.exercises.update(list => {
-      const next = [...list];
-      const sets = next[exerciseIndex].sets;
-      const last = sets[sets.length - 1];
-      next[exerciseIndex] = { ...next[exerciseIndex], sets: [...sets, { ...last }] };
-      return next;
-    });
-  }
+  protected readonly workoutSession = signal<WorkoutSession | null>(null);
+  protected readonly exerciseSessions = signal<ExerciseSession[]>([]);
 
-  protected updateReps(exerciseIndex: number, setIndex: number, value: string): void {
-    this.exercises.update(list => {
-      const next = list.map((e, ei) => ei !== exerciseIndex ? e : {
-        ...e,
-        sets: e.sets.map((s, si) => si !== setIndex ? s : { ...s, reps: +value }),
+  protected readonly exercises = computed<ExerciseLog[]>(() => {
+    const session = this.workoutSession();
+    if (!session) {
+      return [];
+    }
+
+    const setsByExercise = new Map<number, SetLog[]>();
+
+    for (const exerciseSession of this.exerciseSessions()) {
+      const list = setsByExercise.get(exerciseSession.exercise.id) ?? [];
+      list.push({
+        id: exerciseSession.id,
+        reps: exerciseSession.reps ?? 0,
+        kg: exerciseSession.weight ?? 0,
       });
-      return next;
+      setsByExercise.set(exerciseSession.exercise.id, list);
+    }
+
+    return session.workout.exercises.map((exercise) => ({
+      exerciseId: exercise.id,
+      name: exercise.name,
+      sets: setsByExercise.get(exercise.id) ?? [],
+    }));
+  });
+
+  constructor() {
+    effect(() => {
+      const id = Number(this.id());
+
+      this.workoutSessionService.getById(id).subscribe((session) => this.workoutSession.set(session));
+      this.exerciseSessionService.getAll(id).subscribe((sessions) => this.exerciseSessions.set(sessions));
     });
   }
 
-  protected removeSet(exerciseIndex: number, setIndex: number): void {
-    this.exercises.update(list =>
-      list.map((e, ei) => ei !== exerciseIndex ? e : {
-        ...e,
-        sets: e.sets.filter((_, si) => si !== setIndex),
+  protected addSet(exercise: ExerciseLog): void {
+    const session = this.workoutSession();
+    if (!session) {
+      return;
+    }
+
+    const last = exercise.sets[exercise.sets.length - 1];
+
+    this.exerciseSessionService
+      .create({
+        exerciseId: exercise.exerciseId,
+        scheduledAt: new Date(session.scheduledAt),
+        reps: last?.reps ?? 0,
+        weight: last?.kg ?? 0,
+        set: exercise.sets.length + 1,
+        workoutSessionId: session.id,
       })
-    );
+      .subscribe((created) => this.exerciseSessions.update((sessions) => [...sessions, created]));
   }
 
-  protected updateKg(exerciseIndex: number, setIndex: number, value: string): void {
-    this.exercises.update(list => {
-      const next = list.map((e, ei) => ei !== exerciseIndex ? e : {
-        ...e,
-        sets: e.sets.map((s, si) => si !== setIndex ? s : { ...s, kg: +value }),
-      });
-      return next;
-    });
+  protected updateReps(setId: number, value: string): void {
+    this.updateSet(setId, { reps: +value });
+  }
+
+  protected updateKg(setId: number, value: string): void {
+    this.updateSet(setId, { weight: +value });
+  }
+
+  protected removeSet(setId: number): void {
+    this.exerciseSessionService
+      .delete(setId)
+      .subscribe(() => this.exerciseSessions.update((sessions) => sessions.filter((s) => s.id !== setId)));
+  }
+
+  private updateSet(setId: number, changes: { reps?: number; weight?: number }): void {
+    const existing = this.exerciseSessions().find((s) => s.id === setId);
+    if (!existing) {
+      return;
+    }
+
+    this.exerciseSessionService
+      .update(setId, {
+        scheduledAt: new Date(existing.scheduledAt),
+        reps: changes.reps ?? existing.reps ?? undefined,
+        weight: changes.weight ?? existing.weight ?? undefined,
+        set: existing.set ?? undefined,
+        startAt: existing.startAt ? new Date(existing.startAt) : undefined,
+        endAt: existing.endAt ? new Date(existing.endAt) : undefined,
+      })
+      .subscribe((updated) =>
+        this.exerciseSessions.update((sessions) => sessions.map((s) => (s.id === setId ? updated : s))),
+      );
   }
 }

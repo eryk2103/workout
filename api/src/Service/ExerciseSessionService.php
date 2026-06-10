@@ -23,9 +23,9 @@ class ExerciseSessionService
         private WorkoutSessionRepository $workoutSessionRepository,
     ) {}
 
-    public function get(): array
+    public function get(?int $workoutSessionId = null): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findByFilters($workoutSessionId);
     }
 
     public function getById(int $id): ?ExerciseSession

@@ -10,10 +10,10 @@
     Calendar
   </a>
 
-  <h1 class="text-2xl font-bold text-gray-900">{{ name() }}</h1>
+  <h1 class="text-2xl font-bold text-gray-900">{{ workoutSession()?.workout?.name ?? 'Workout Session' }}</h1>
 
   <ul class="flex flex-col gap-4">
-    @for (exercise of exercises(); track exercise.name; let ei = $index) {
+    @for (exercise of exercises(); track exercise.exerciseId) {
       <li class="flex flex-col gap-3 rounded-xl bg-white p-4 shadow-sm">
         <p class="font-semibold text-gray-900">{{ exercise.name }}</p>
 
@@ -25,15 +25,15 @@
             <span class="w-8"></span>
           </div>
 
-          @for (set of exercise.sets; track $index; let si = $index) {
+          @for (set of exercise.sets; track set.id; let si = $index) {
             <div class="flex items-center gap-3">
               <span class="w-8 text-sm font-medium text-gray-400">{{ si + 1 }}</span>
               <input
                 type="number"
                 min="0"
                 [value]="set.reps"
-                (change)="updateReps(ei, si, $any($event.target).value)"
-                [id]="exercise.name + '-set-' + si + '-reps'"
+                (change)="updateReps(set.id, $any($event.target).value)"
+                [id]="exercise.name + '-set-' + set.id + '-reps'"
                 [attr.aria-label]="exercise.name + ' set ' + (si + 1) + ' reps'"
                 class="flex-1 min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
@@ -41,14 +41,14 @@
                 type="number"
                 min="0"
                 [value]="set.kg"
-                (change)="updateKg(ei, si, $any($event.target).value)"
-                [id]="exercise.name + '-set-' + si + '-kg'"
+                (change)="updateKg(set.id, $any($event.target).value)"
+                [id]="exercise.name + '-set-' + set.id + '-kg'"
                 [attr.aria-label]="exercise.name + ' set ' + (si + 1) + ' kg'"
                 class="flex-1 min-w-0 rounded-xl border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-900 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               />
               <button
                 type="button"
-                (click)="removeSet(ei, si)"
+                (click)="removeSet(set.id)"
                 class="w-8 flex items-center justify-center text-gray-300 hover:text-red-400 focus:outline-none"
                 [attr.aria-label]="'Delete set ' + (si + 1) + ' of ' + exercise.name"
               >
@@ -62,7 +62,7 @@
 
         <button
           type="button"
-          (click)="addSet(ei)"
+          (click)="addSet(exercise)"
           class="flex items-center gap-1.5 self-start text-sm font-medium text-blue-600 focus:outline-none"
         >
           <svg xmlns="http://www.w3.org/2000/svg" class="size-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" aria-hidden="true">

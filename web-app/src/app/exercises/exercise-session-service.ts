@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
@@ -29,8 +29,14 @@ export class ExerciseSessionService {
   private readonly http = inject(HttpClient);
   private readonly baseUrl = `${environment.apiUrl}/exercise-sessions`;
 
-  getAll(): Observable<ExerciseSession[]> {
-    return this.http.get<ExerciseSession[]>(this.baseUrl);
+  getAll(workoutSessionId?: number): Observable<ExerciseSession[]> {
+    let params = new HttpParams();
+
+    if (workoutSessionId !== undefined) {
+      params = params.set('workoutSessionId', workoutSessionId);
+    }
+
+    return this.http.get<ExerciseSession[]>(this.baseUrl, { params });
   }
 
   getById(id: number): Observable<ExerciseSession> {

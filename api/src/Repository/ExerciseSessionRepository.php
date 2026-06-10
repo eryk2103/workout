@@ -15,4 +15,15 @@ class ExerciseSessionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, ExerciseSession::class);
     }
+
+    public function findByFilters(?int $workoutSessionId = null): array
+    {
+        $qb = $this->createQueryBuilder('es');
+
+        if ($workoutSessionId !== null) {
+            $qb->andWhere('es.workoutSession = :workoutSessionId')->setParameter('workoutSessionId', $workoutSessionId);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

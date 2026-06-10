@@ -1,6 +1,8 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { Search } from '../../shared/search/search';
+import { Workout } from '../../workouts/workout-model';
+import { WorkoutService } from '../../workouts/workout-service';
 import { WorkoutSession } from '../../workouts/workout-session-model';
 import { WorkoutSessionService } from '../../workouts/workout-session-service';
 
@@ -18,7 +20,7 @@ interface TimeSlot {
 export class CalendarDetail {
   date = input.required<string>();
 
-  private readonly router = inject(Router);
+  private readonly workoutService = inject(WorkoutService);
   private readonly workoutSessionService = inject(WorkoutSessionService);
 
   protected readonly displayDate = computed(() => {
@@ -43,25 +45,52 @@ export class CalendarDetail {
 
   protected readonly modalOpen = signal(false);
 
-  protected readonly availableWorkouts = [
-    'Push Day', 'Pull Day', 'Leg Day', 'Full Body',
-    'Cardio', 'Stretching', 'Core & Cardio', 'Active Recovery',
-  ];
+  protected readonly availableWorkouts = signal<Workout[]>([]);
+
+  protected readonly selectedTime = signal('08:00');
 
   constructor() {
     effect(() => {
-      const date = this.date();
-      const startDate = new Date(`${date}T00:00:00`);
-      const endDate = new Date(`${date}T23:59:59.999`);
-
-      this.workoutSessionService
-        .getAll(startDate, endDate)
-        .subscribe((sessions) => this.workoutSessions.set(sessions));
+      this.date();
+      this.loadSessions();
     });
   }
 
-  protected selectWorkout(name: string): void {
-    this.modalOpen.set(false);
-    this.router.navigate(['/workout-log', name]);
+  protected openModal(): void {
+    this.modalOpen.set(true);
+    this.selectedTime.set('08:00');
+    this.loadWorkouts();
+  }
+
+  protected onSearch(search: string): void {
+    this.loadWorkouts(search);
+  }
+
+  protected onTimeChange(event: Event): void {
+    this.selectedTime.set((event.target as HTMLInputElement).value);
+  }
+
+  protected selectWorkout(workout: Workout): void {
+    const time = this.selectedTime() || '00:00';
+    const scheduledAt = new Date(`${this.date()}T${time}:00`);
+
+    this.workoutSessionService.create(workout.id, scheduledAt).subscribe(() => {
+      this.modalOpen.set(false);
+      this.loadSessions();
+    });
+  }
+
+  private loadSessions(): void {
+    const date = this.date();
+    const startDate = new Date(`${date}T00:00:00`);
+    const endDate = new Date(`${date}T23:59:59.999`);
+
+    this.workoutSessionService
+      .getAll(startDate, endDate)
+      .subscribe((sessions) => this.workoutSessions.set(sessions));
+  }
+
+  private loadWorkouts(search = ''): void {
+    this.workoutService.getAll(search).subscribe((workouts) => this.availableWorkouts.set(workouts));
   }
 }
