@@ -64,6 +64,10 @@
         ],
         "post-update-cmd": [
             "@auto-scripts"
+        ],
+        "test": [
+            "php bin/console doctrine:fixtures:load --env=test --no-interaction",
+            "phpunit"
         ]
     },
     "conflict": {

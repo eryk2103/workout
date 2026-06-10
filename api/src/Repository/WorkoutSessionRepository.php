@@ -15,4 +15,21 @@ class WorkoutSessionRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, WorkoutSession::class);
     }
+
+    public function findByFilters(?\DateTime $startDate = null, ?\DateTime $endDate = null): array
+    {
+        $qb = $this->createQueryBuilder('ws');
+
+        if ($startDate !== null) {
+            $qb->andWhere('ws.scheduledAt >= :startDate')
+                ->setParameter('startDate', $startDate);
+        }
+
+        if ($endDate !== null) {
+            $qb->andWhere('ws.scheduledAt <= :endDate')
+                ->setParameter('endDate', $endDate);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
 }

@@ -19,9 +19,9 @@ class WorkoutSessionService
         private EntityManagerInterface $em,
     ) {}
 
-    public function get(): array
+    public function get(?\DateTime $startDate = null, ?\DateTime $endDate = null): array
     {
-        return $this->repository->findAll();
+        return $this->repository->findByFilters($startDate, $endDate);
     }
 
     public function getById(int $id): WorkoutSession

@@ -9,6 +9,7 @@ use App\Service\WorkoutSessionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Attribute\MapQueryParameter;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -21,9 +22,15 @@ class WorkoutSessionController extends AbstractController
     ) {}
 
     #[Route('', methods: ['GET'])]
-    public function index(): JsonResponse
+    public function index(
+        #[MapQueryParameter] ?string $startDate = null,
+        #[MapQueryParameter] ?string $endDate = null,
+    ): JsonResponse
     {
-        $sessions = $this->service->get();
+        $sessions = $this->service->get(
+            $startDate !== null ? new \DateTime($startDate) : null,
+            $endDate !== null ? new \DateTime($endDate) : null,
+        );
         $dtos = array_map(fn($session) => $this->mapper->toDto($session), $sessions);
 
         return $this->json($dtos);
