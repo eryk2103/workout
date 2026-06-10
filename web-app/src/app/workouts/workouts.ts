@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { List } from '../shared/list/list';
 import { ListItem } from '../shared/list-item/list-item';
 import { Search } from '../shared/search/search';
+import { WorkoutService } from './workout-service';
+import { Workout } from './workout-model';
 
 @Component({
   selector: 'app-workouts',
@@ -11,14 +13,19 @@ import { Search } from '../shared/search/search';
   styles: ``,
 })
 export class Workouts {
-  protected readonly workouts = [
-    'Push Day',
-    'Pull Day',
-    'Leg Day',
-    'Upper Body',
-    'Lower Body',
-    'Full Body',
-    'Core & Cardio',
-    'Active Recovery',
-  ];
+  private readonly workoutService = inject(WorkoutService);
+
+  protected readonly workouts = signal<Workout[]>([]);
+
+  constructor() {
+    this.loadWorkouts();
+  }
+
+  protected onSearch(search: string) {
+    this.loadWorkouts(search);
+  }
+
+  private loadWorkouts(search = '') {
+    this.workoutService.getAll(search).subscribe((workouts) => this.workouts.set(workouts));
+  }
 }
