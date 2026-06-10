@@ -9,7 +9,7 @@ import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 export class ExerciseForm {
   private readonly fb = inject(FormBuilder);
 
-  protected readonly form = this.fb.group({
+  readonly form = this.fb.group({
     name: ['', Validators.required],
   });
 }

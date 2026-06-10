@@ -13,11 +13,11 @@
     </a>
   </div>
 
-  <app-search placeholder="Search exercises..." />
+  <app-search placeholder="Search exercises..." (valueChange)="onSearch($event)" />
 
   <app-list label="Exercise list">
-    @for (exercise of exercises; track exercise) {
-      <app-list-item [name]="exercise" />
+    @for (exercise of exercises(); track exercise.id) {
+      <app-list-item [name]="exercise.name" />
     }
   </app-list>
 </div>
