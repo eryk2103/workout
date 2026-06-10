@@ -38,8 +38,14 @@
         >
           <span class="w-10 text-sm text-gray-400">{{ day.dayName }}</span>
           <span class="w-6 text-center text-lg font-bold text-gray-900">{{ day.dayNumber }}</span>
-          <span class="flex-1 text-sm text-gray-700">Full body</span>
-          <span class="text-xs font-medium text-blue-500">+2</span>
+          @if (day.sessions.length > 0) {
+            <span class="flex-1 text-sm text-gray-700">{{ day.sessions[0].workout.name }}</span>
+            @if (day.sessions.length > 1) {
+              <span class="text-xs font-medium text-blue-500">+{{ day.sessions.length - 1 }}</span>
+            }
+          } @else {
+            <span class="flex-1 text-sm text-gray-400">No workouts</span>
+          }
         </a>
       </li>
     }
