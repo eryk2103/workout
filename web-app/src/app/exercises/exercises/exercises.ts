@@ -3,7 +3,7 @@ import { RouterLink } from '@angular/router';
 import { List } from '../../shared/list/list';
 import { ListItem } from '../../shared/list-item/list-item';
 import { Search } from '../../shared/search/search';
-import { ExerciseService } from '../exercise';
+import { ExerciseService } from '../exercise-service';
 import { Exercise } from '../exercise-model';
 
 @Component({

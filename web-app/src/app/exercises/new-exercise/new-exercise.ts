@@ -1,7 +1,7 @@
 import { Component, inject, viewChild } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { ExerciseForm } from '../exercise-form/exercise-form';
-import { ExerciseService } from '../exercise';
+import { ExerciseService } from '../exercise-service';
 
 @Component({
   selector: 'app-new-exercise',

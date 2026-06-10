@@ -2,7 +2,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { provideHttpClient } from '@angular/common/http';
 import { TestBed } from '@angular/core/testing';
 import { environment } from '../../environments/environment';
-import { ExerciseService } from './exercise';
+import { ExerciseService } from './exercise-service';
 import { Exercise } from './exercise-model';
 
 describe('ExerciseService', () => {
