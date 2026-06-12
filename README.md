@@ -1,6 +1,6 @@
 # Workout
 
-A workout tracking application with a Symfony API backend and an Angular frontend.
+A workout tracking application with a Symfony REST API and an Angular frontend.
 
 ## Features
 
