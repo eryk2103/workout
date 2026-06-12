@@ -1,5 +1,5 @@
 import { Component, computed, effect, inject, input, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { ExerciseSession } from '../exercises/exercise-session-model';
 import { ExerciseSessionService } from '../exercises/exercise-session-service';
 import { WorkoutSession } from '../workouts/workout-session-model';
@@ -25,6 +25,7 @@ interface ExerciseLog {
 export class WorkoutLog {
   id = input.required<string>();
 
+  private readonly router = inject(Router);
   private readonly workoutSessionService = inject(WorkoutSessionService);
   private readonly exerciseSessionService = inject(ExerciseSessionService);
 
@@ -117,5 +118,19 @@ export class WorkoutLog {
       .subscribe((updated) =>
         this.exerciseSessions.update((sessions) => sessions.map((s) => (s.id === setId ? updated : s))),
       );
+  }
+
+  protected finishWorkout(): void {
+    const session = this.workoutSession();
+    if (!session) {
+      return;
+    }
+
+    const date = new Date(session.scheduledAt);
+    const yyyy = date.getFullYear();
+    const mm = String(date.getMonth() + 1).padStart(2, '0');
+    const dd = String(date.getDate()).padStart(2, '0');
+
+    this.router.navigate(['/calendar', `${yyyy}-${mm}-${dd}`]);
   }
 }

@@ -7,6 +7,7 @@ use App\Dto\UpdateWorkoutSessionDto;
 use App\Entity\WorkoutSession;
 use App\Exception\WorkoutNotFoundException;
 use App\Exception\WorkoutSessionNotFoundException;
+use App\Repository\WorkoutExerciseRepository;
 use App\Repository\WorkoutRepository;
 use App\Repository\WorkoutSessionRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,6 +17,7 @@ class WorkoutSessionService
     public function __construct(
         private WorkoutSessionRepository $repository,
         private WorkoutRepository $workoutRepository,
+        private WorkoutExerciseRepository $weRepository,
         private EntityManagerInterface $em,
     ) {}
 
@@ -32,6 +34,11 @@ class WorkoutSessionService
         }
 
         return $workoutSession;
+    }
+
+    public function getWorkoutExercises(WorkoutSession $session): array
+    {
+        return $this->weRepository->findBy(['workout' => $session->getWorkout()]);
     }
 
     public function create(CreateWorkoutSessionDto $dto): WorkoutSession

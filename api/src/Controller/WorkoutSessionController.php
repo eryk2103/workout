@@ -31,7 +31,10 @@ class WorkoutSessionController extends AbstractController
             $startDate !== null ? new \DateTime($startDate) : null,
             $endDate !== null ? new \DateTime($endDate) : null,
         );
-        $dtos = array_map(fn($session) => $this->mapper->toDto($session), $sessions);
+        $dtos = array_map(
+            fn($session) => $this->mapper->toDto($session, $this->service->getWorkoutExercises($session)),
+            $sessions,
+        );
 
         return $this->json($dtos);
     }
@@ -41,7 +44,7 @@ class WorkoutSessionController extends AbstractController
     {
         $session = $this->service->getById($id);
 
-        return $this->json($this->mapper->toDto($session));
+        return $this->json($this->mapper->toDto($session, $this->service->getWorkoutExercises($session)));
     }
 
     #[Route('', methods: ['POST'])]

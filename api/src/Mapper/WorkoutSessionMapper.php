@@ -11,12 +11,12 @@ class WorkoutSessionMapper
 {
     public function __construct(private WorkoutMapper $workoutMapper) {}
 
-    public function toDto(WorkoutSession $session): WorkoutSessionDto
+    public function toDto(WorkoutSession $session, array $workoutExercises = []): WorkoutSessionDto
     {
         return new WorkoutSessionDto(
             id: $session->getId(),
             scheduledAt: $session->getScheduledAt(),
-            workout: $this->workoutMapper->toDto($session->getWorkout()),
+            workout: $this->workoutMapper->toDto($session->getWorkout(), $workoutExercises),
         );
     }
 
